@@ -10,8 +10,8 @@ const menuItemSchema=mongoose.Schema({
         type:Number,
         require:true
     },
-    catogery:{
-        type:String,
+    categories:{
+        type:[String],
         require:true
     }
 })

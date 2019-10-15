@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Cafateria Counter APP</string>
+    <string name="developer">Sujan Timalsina</string>
+    <string name="design_and_developed">Design and Developed BY</string>
+
+    <string name="loading">Loading</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
