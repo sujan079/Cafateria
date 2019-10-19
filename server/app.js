@@ -6,7 +6,7 @@ const body_parser=require("body-parser");
 const app=express();
 
 const menuItemRoutes=require('./api/routes/menu_items.routes');
-const counterRoutes=require('./api/routes/counter.routes');
+const todayRoutineRoutes=require('./api/routes/today_routine.routes');
 const orderHistoryRoutes=require('./api/routes/order_history.routes');
 
 app.use(body_parser.urlencoded({extended:true}))
@@ -24,7 +24,7 @@ mongoose.connect(`mongodb+srv://${process.env.MONGODB_ATLAS_USER}:${process.env.
 })
 
 app.use('/menu-items',menuItemRoutes);
-app.use('/counter',counterRoutes);
+app.use('/today-routine',todayRoutineRoutes);
 app.use('/order-history',orderHistoryRoutes);
 
 
