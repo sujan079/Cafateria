@@ -7,4 +7,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fetching_data">Fetching Data</string>
+    <string name="categories">Categories</string>
+    <string name="menuitems">MenuItems</string>
+    <string name="fetching_data_failed">Fetching Data Failed</string>
 </resources>

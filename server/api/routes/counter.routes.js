@@ -7,16 +7,23 @@ const MenuItemCategories=require('../models/menu_item_categories.model');
 
 router.get('/',(req,res,next)=>{
    let categories=[];
+   const categoryType=req.query.category
+
     MenuItemCategories.find()
     .exec()
     .then(result=>{
-        console.log(result)
         categories=result;
-        return MenuItems.find().exec()
+        if(categoryType==="ALL"){
+            return MenuItems.find().exec()
+        }else{
+            return MenuItems.find({categories:categoryType}).exec()
+        }
     })
     .then(menu_items=>{
         res.status(200).json({
-            categories:categories,
+            categories:categories.map(category=>{
+                return category.category
+            }),
             menu_items:menu_items.map(item=>{
                 return {
                     itemName:item.itemName,

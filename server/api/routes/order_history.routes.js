@@ -17,28 +17,28 @@ router.get('/',(req,res,next)=>{
 router.post('/',(req,res,next)=>{
     const order=req.body;
 
-
-    const OrderHistory=OrderHistory({
+    const orderHistory=new OrderHistory({
         _id:mongoose.Types.ObjectId(),
         itemName:order.itemName,
         price:order.price,
         categories:order.categories,
+        quantity:order.quantity,
         order_From:order.user,
-        order_date:order.date||new Date().getDate(),
-        order_time:order.time||new Date().getTime()
+        order_date:order.order_date,
+        order_time:order.order_time
     });
 
-    OrderHistory
+    orderHistory
     .save()
     .then((orderHistory)=>{
         return res.status(200).json({
             message:"Success Added Order History",
-            ...OrderHistory
+            ...orderHistory
         })
     })
     .catch(err=>{
         return res.status(500).json({
-            message:"Could not add Order History"
+            message:"Could not add Order History"+err
         })
     })
 
