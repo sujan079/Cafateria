@@ -21,9 +21,9 @@ router.post('/',(req,res,next)=>{
         _id:mongoose.Types.ObjectId(),
         itemName:order.itemName,
         price:order.price,
+        order_by:order.order_by||null,
         categories:order.categories,
         quantity:order.quantity,
-        order_From:order.user,
         order_date:order.order_date,
         order_time:order.order_time
     });

@@ -26,6 +26,7 @@ router.get('/',(req,res,next)=>{
             }),
             menu_items:menu_items.map(item=>{
                 return {
+                    _id:item._id,
                     itemName:item.itemName,
                     price:item.price,
                     categories:item.categories

@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">CafateriaClientApp</string>
+
+    <string name="developer">Sujan Timalsina</string>
+    <string name="design_and_developed">Design and Developed BY</string>
+
+    <string name="loading">Loading</string>
+
+
+    <string name="fetching_data">Fetching Data</string>
+    <string name="categories">Categories</string>
+    <string name="menuitems">MenuItems</string>
+    <string name="fetching_data_failed">Fetching Data Failed</string>
+
+    <string name="order">Order</string>
+    <string name="price">Price</string>
+    <string name="sign_with_google">SIGN WITH GOOGLE</string>
+    <string name="user_info">User Info</string>
+    <string name="sign_out">SIGN OUT</string>
+    <string name="profile_image">Profile Image</string>
+    <string name="view_more">View More</string>
+    <string name="last_orders">Last Orders</string>
 </resources>

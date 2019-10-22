@@ -29,8 +29,8 @@ import com.example.cafateriacounterapp.Database.Models.DB_Category;
 import com.example.cafateriacounterapp.Database.Models.DB_MenuItem;
 import com.example.cafateriacounterapp.Database.Models.DB_Orders_History;
 import com.example.cafateriacounterapp.Executors.AppExecutor;
-import com.example.cafateriacounterapp.Network.API.CounterApi;
-import com.example.cafateriacounterapp.Network.GSON_Models.MenuItems.CounterData;
+import com.example.cafateriacounterapp.Network.API.TodayRoutineApi;
+import com.example.cafateriacounterapp.Network.GSON_Models.MenuItems.TodayRoutineData;
 import com.example.cafateriacounterapp.Network.GSON_Models.MenuItems.MenuItem;
 import com.example.cafateriacounterapp.Network.RetrofitClient;
 import com.example.cafateriacounterapp.Printer.PrinterHelper;
@@ -148,24 +148,24 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
 
         Retrofit retrofit= RetrofitClient.getInstance();
 
-        CounterApi counterApi=retrofit.create(CounterApi.class);
+        TodayRoutineApi todayRoutineApi =retrofit.create(TodayRoutineApi.class);
 
-        Call<CounterData> counterDataCall=counterApi.getCounterData(category);
+        Call<TodayRoutineData> counterDataCall= todayRoutineApi.getCounterData(category);
 
-        counterDataCall.enqueue(new Callback<CounterData>() {
+        counterDataCall.enqueue(new Callback<TodayRoutineData>() {
             @Override
-            public void onResponse(Call<CounterData> call, Response<CounterData> response) {
+            public void onResponse(Call<TodayRoutineData> call, Response<TodayRoutineData> response) {
                 hideDialogBox(fetchingData);
-                CounterData counterData=response.body();
+                TodayRoutineData todayRoutineData =response.body();
 
-                saveToDataBase(counterData.getMenuItems(),counterData.getCategories());
+                saveToDataBase(todayRoutineData.getMenuItems(), todayRoutineData.getCategories());
 
                 showError=true;
                 serverConn=true;
             }
 
             @Override
-            public void onFailure(Call<CounterData> call, Throwable t) {
+            public void onFailure(Call<TodayRoutineData> call, Throwable t) {
                 if(showError){
                     errorDialogbox(t.getMessage());
                     hideDialogBox(fetchingData);

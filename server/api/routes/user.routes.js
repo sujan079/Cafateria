@@ -22,6 +22,7 @@ const fileFilter=(req,file,cb)=>{
         cb(new Error("File not Image"),false);
     }
 }
+
 const upload=multer(
     {
         storage:storage,
@@ -31,29 +32,70 @@ const upload=multer(
     
     );
 
-router.post('/',upload.single(),(req,res,next)=>{
+    
+
+
+
+
+router.post('/',(req,res,next)=>{
     const user=req.body;
 
     const newUser=new User({
-        _id:user.phone_number,
-        firstName:user.firstName,
-        lastName:user.lastName,
-        phone_number:user.phone_number,
-        address:user.address,
-        profile:req.file.path
+        _id:user._id,
+        email:user.email
     }); 
 
-    newUser
-    .save()
-    .then((user)=>{
-        return res.status().json({
-            message:"User Successfully Added",
-            user
-        })
+    User.findById(user._id)
+    .exec()
+    .then(user=>{
+        if(user!=null){
+            return res.status(200).json({
+                message:"User exists"
+            })
+        }
+        else{
+                return newUser.save()
+                .then((user)=>{
+                    return res.status(200).json({
+                        message:"User Successfully Added",
+                        user
+                    })
+                })
+                .catch(err=>{
+                    console.log(err)
+                    return res.status(500).json({
+                        message:"Could Not Add User "
+                    })
+                }) ;
+        }
+        
+    })
+    
+})
+
+router.get('/:id',(req,res,next)=>{
+    const id=req.params.id;
+
+    User.findById(id)
+    .exec()
+    .then(user=>{
+        if(user==null){
+            return res.status(404).json({
+                message:"No user found"
+            })
+
+        }else{
+            return res.status(200).json({
+                _id:user._id,
+                email:user.email
+            })
+        }
     })
     .catch(err=>{
         return res.status(500).json({
-            message:"Could Not Add User "
+            message:"Invalid User ID"
         })
-    }) 
+    })
 })
+
+module.exports=router;

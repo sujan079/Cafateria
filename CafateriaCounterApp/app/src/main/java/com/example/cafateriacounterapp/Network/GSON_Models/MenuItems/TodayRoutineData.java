@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class CounterData {
+public class TodayRoutineData {
 
 
     @SerializedName("categories")
@@ -31,7 +31,7 @@ public class CounterData {
 
     @Override
     public String toString() {
-        return "CounterData{" +
+        return "TodayRoutineData{" +
                 "categories=" + categories +
                 ", menuItems=" + menuItems +
                 '}';

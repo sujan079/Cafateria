@@ -28,7 +28,6 @@ public abstract class CafateriaDatabase extends RoomDatabase{
         if(LOCK==null){
             LOCK=new Object();
             INSTANCE=Room.databaseBuilder(context,CafateriaDatabase.class,DATABASE_NAME)
-                    .allowMainThreadQueries()
                     .build();
         }
         return INSTANCE;
