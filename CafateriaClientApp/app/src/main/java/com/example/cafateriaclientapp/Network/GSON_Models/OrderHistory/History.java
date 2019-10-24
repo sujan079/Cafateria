@@ -1,11 +1,19 @@
-package com.example.cafateriaclientapp.Network.GSON_Models.OrdersHistory;
+package com.example.cafateriaclientapp.Network.GSON_Models.OrderHistory;
 
 import com.google.gson.annotations.SerializedName;
 
-public class OrdersHistory {
+import java.util.List;
+
+public class History {
 
     @SerializedName("_id")
     private String _id;
+
+    @SerializedName("categories")
+    private List<String> categories;
+
+    @SerializedName("quantity")
+    private Integer quantity;
 
     @SerializedName("itemName")
     private String itemName;
@@ -16,23 +24,11 @@ public class OrdersHistory {
     @SerializedName("order_by")
     private String order_by;
 
-    @SerializedName("quantity")
-    private Integer quantity;
-
     @SerializedName("order_date")
     private String order_date;
 
     @SerializedName("order_time")
     private String order_time;
-
-    public OrdersHistory(String itemName, Double price, String order_by, Integer quantity, String order_date, String order_time) {
-        this.itemName = itemName;
-        this.price = price;
-        this.order_by = order_by;
-        this.quantity = quantity;
-        this.order_date = order_date;
-        this.order_time = order_time;
-    }
 
     public String get_id() {
         return _id;
@@ -40,6 +36,22 @@ public class OrdersHistory {
 
     public void set_id(String _id) {
         this._id = _id;
+    }
+
+    public List<String> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public String getItemName() {
@@ -64,14 +76,6 @@ public class OrdersHistory {
 
     public void setOrder_by(String order_by) {
         this.order_by = order_by;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
     }
 
     public String getOrder_date() {

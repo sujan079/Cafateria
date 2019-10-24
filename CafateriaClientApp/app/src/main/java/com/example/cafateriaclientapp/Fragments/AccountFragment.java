@@ -21,12 +21,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cafateriaclientapp.Adapter.GeneralInfoAdapter;
+import com.example.cafateriaclientapp.Adapter.OrderHistoryAdapter;
 import com.example.cafateriaclientapp.Database.CafateriaDatabase;
 import com.example.cafateriaclientapp.Database.Models.DB_User;
 import com.example.cafateriaclientapp.Executors.AppExecutor;
+import com.example.cafateriaclientapp.MainActivity;
+import com.example.cafateriaclientapp.Network.Api.OrderHistoryApi;
 import com.example.cafateriaclientapp.Network.Api.UserApi;
+import com.example.cafateriaclientapp.Network.GSON_Models.OrderHistory.History;
+import com.example.cafateriaclientapp.Network.GSON_Models.OrderHistory.OrderHistory;
 import com.example.cafateriaclientapp.Network.GSON_Models.User.User;
 import com.example.cafateriaclientapp.Network.RetrofitClient;
+import com.example.cafateriaclientapp.OrderHistoryActivity;
 import com.example.cafateriaclientapp.R;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -68,6 +74,10 @@ public class AccountFragment extends Fragment {
     private RecyclerView rvGeneralInfo;
     private RecyclerView.LayoutManager rvGeneralInfoLayoutManager;
     private GeneralInfoAdapter generalInfoAdapter;
+
+    private RecyclerView rvOrderHistory;
+    private RecyclerView.LayoutManager orderHistoryLayoutManger;
+    private OrderHistoryAdapter orderHistoryAdapter;
 
 
     public interface Callbacks {
@@ -122,6 +132,16 @@ public class AccountFragment extends Fragment {
         }
     };
 
+    private Handler loadOrdersHistoryHandler=new Handler(){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            List<History> info= (List<History>) msg.obj;
+            orderHistoryAdapter.setHistories(info);
+            orderHistoryAdapter.notifyDataSetChanged();
+        }
+    };
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -134,11 +154,26 @@ public class AccountFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         context=getContext();
 
+        Button view_more=view.findViewById(R.id.view_more);
+
+        view_more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startOrderHistoryIntent();
+            }
+        });
+
         rvGeneralInfo=view.findViewById(R.id.rv_userInfo);
         rvGeneralInfoLayoutManager=new LinearLayoutManager(context);
         generalInfoAdapter=new GeneralInfoAdapter(new ArrayList<String>());
         rvGeneralInfo.setLayoutManager(rvGeneralInfoLayoutManager);
         rvGeneralInfo.setAdapter(generalInfoAdapter);
+
+        rvOrderHistory=view.findViewById(R.id.rv_last_orders);
+        orderHistoryLayoutManger=new LinearLayoutManager(context);
+        orderHistoryAdapter=new OrderHistoryAdapter(new ArrayList<History>());
+        rvOrderHistory.setAdapter(orderHistoryAdapter);
+        rvOrderHistory.setLayoutManager(orderHistoryLayoutManger);
 
         accoutView=view.findViewById(R.id.account_view);
 
@@ -171,6 +206,7 @@ public class AccountFragment extends Fragment {
 
                     showAccountViewHandler.sendMessage(dataMsg);
                     loadUserInfo(users.get(0));
+                    loadUserHistory(users.get(0));
 
                 }else{
                     Message errMsg=new Message();
@@ -212,6 +248,38 @@ public class AccountFragment extends Fragment {
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 errorDialogbox(t.getMessage());
+            }
+        });
+    }
+
+    public void loadUserHistory(DB_User currentUser){
+        OrderHistoryApi orderHistoryApi=retrofit.create(OrderHistoryApi.class);
+        Call<OrderHistory> orderHistoryCall=orderHistoryApi.getAllHistory(currentUser.getId(),null,new Integer(10));
+        orderHistoryCall.enqueue(new Callback<OrderHistory>() {
+            @Override
+            public void onResponse(Call<OrderHistory> call, Response<OrderHistory> response) {
+                if(response.code()==200){
+                    OrderHistory orderHistory=response.body();
+                    Message historyMsg=new Message();
+                    historyMsg.obj=orderHistory.getOrderHistory();
+
+                    loadOrdersHistoryHandler.sendMessage(historyMsg);
+                }else{
+                    Message errMsg=new Message();
+                    errMsg.obj="Could Not get History";
+                    showErrorDialogHandler.sendMessage(errMsg);
+
+                    showLoginSignUpHandler.sendMessage(new Message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<OrderHistory> call, Throwable t) {
+                Message errMsg=new Message();
+                errMsg.obj="Could Not get History";
+                showErrorDialogHandler.sendMessage(errMsg);
+
+                showLoginSignUpHandler.sendMessage(new Message());
             }
         });
     }
@@ -271,6 +339,7 @@ public class AccountFragment extends Fragment {
                 DB_User saveUser=new DB_User(uid,email);
                 mDB.userDao().addUser(saveUser);
                 loadUserInfo(saveUser);
+                loadUserHistory(saveUser);
 
 
             }
@@ -332,5 +401,11 @@ public class AccountFragment extends Fragment {
                 errorDialog.cancel();
             }
         }
+    }
+
+
+    public void startOrderHistoryIntent(){
+        Intent intent=new Intent(getActivity(), OrderHistoryActivity.class);
+        startActivity(intent);
     }
 }

@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cafateriaclientapp.ActionListener.OrdersActionListener;
@@ -24,9 +23,9 @@ import com.example.cafateriaclientapp.Database.CafateriaDatabase;
 import com.example.cafateriaclientapp.Database.Models.DB_Orders;
 import com.example.cafateriaclientapp.Database.Models.DB_User;
 import com.example.cafateriaclientapp.Executors.AppExecutor;
-import com.example.cafateriaclientapp.Network.Api.OrderHistoryApi;
-import com.example.cafateriaclientapp.Network.GSON_Models.OrdersHistory.OrdersHistory;
-import com.example.cafateriaclientapp.Network.GSON_Models.User.User;
+import com.example.cafateriaclientapp.Network.Api.OrdersApi;
+import com.example.cafateriaclientapp.Network.GSON_Models.MenuItems.MenuItem;
+import com.example.cafateriaclientapp.Network.GSON_Models.Orders.Order;
 import com.example.cafateriaclientapp.Network.RetrofitClient;
 import com.example.cafateriaclientapp.R;
 
@@ -61,6 +60,7 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
 
+            fetchingData.cancel();
             errorDialogbox((String) msg.obj);
         }
     };
@@ -121,9 +121,19 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
                     DB_User currentUser=users.get(0);
                     List<DB_Orders> orders=mDB.ordersDao().getOrders();
 
+                    List<MenuItem> ordItems=new ArrayList<>();
 
-                    //TODO Create A end point that excepts Orders
+                    for (DB_Orders ord:orders) {
+                        ordItems.add(new MenuItem(
+                           ord.getItemId(),
+                           ord.getItemName(),
+                           ord.getCategories(),
+                           ord.getPrice(),
+                           ord.getQuantity()
+                        ));
+                    }
 
+                    sendOrderToServer(new Order(currentUser.getId(),ordItems));
 
                 }else{
                     Message message=new Message();
@@ -134,16 +144,17 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
         });
     }
 
-    public void sendOrderToServer(OrdersHistory ordersHistory){
-        OrderHistoryApi orderHistoryApi=retrofit.create(OrderHistoryApi.class);
+    public void sendOrderToServer(Order orders){
+        OrdersApi ordersApi =retrofit.create(OrdersApi.class);
 
-        Call<OrdersHistory> ordersHistoryCall=orderHistoryApi.addOrderToHisory(ordersHistory);
+        Call<Order> ordersHistoryCall= ordersApi.addOrderToHisory(orders);
 
-        ordersHistoryCall.enqueue(new Callback<OrdersHistory>() {
+        ordersHistoryCall.enqueue(new Callback<Order>() {
             @Override
-            public void onResponse(Call<OrdersHistory> call, Response<OrdersHistory> response) {
+            public void onResponse(Call<Order> call, Response<Order> response) {
                 if(response.code()==200){
-
+                    deletAllOrder();
+                     fetchingData.cancel();
                 }else {
                     Message message=new Message();
                     message.obj="Could Not Register Order";
@@ -152,8 +163,7 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
             }
 
             @Override
-            public void onFailure(Call<OrdersHistory> call, Throwable t) {
-
+            public void onFailure(Call<Order> call, Throwable t) {
                 Message message=new Message();
                 message.obj=t.getMessage();
                 showErrorDialogHandler.sendMessage(message);
@@ -206,6 +216,16 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
             @Override
             public void run() {
                 mDB.ordersDao().deleteOrder(orders);
+                getAllOrders();
+            }
+        });
+    }
+
+    public void deletAllOrder() {
+        AppExecutor.getInstance().getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDB.ordersDao().deleteOrder();
                 getAllOrders();
             }
         });

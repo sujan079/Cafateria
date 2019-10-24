@@ -18,6 +18,25 @@ public class MenuItem {
     @SerializedName("price")
     private Double price;
 
+    @SerializedName("quantity")
+    private Double quantity;
+
+    public MenuItem(String _id, String itemName, List<String> categories, Double price, Double quantity) {
+        this._id = _id;
+        this.itemName = itemName;
+        this.categories = categories;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
+    public Double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
+    }
+
     public String getItemName() {
         return itemName;
     }

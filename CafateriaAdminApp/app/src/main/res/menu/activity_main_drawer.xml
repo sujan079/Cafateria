@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_menu_item"
+            android:title="@string/menu_item" />
+        <item
+            android:id="@+id/nav_order_history"
+            android:title="@string/order_history" />
+        <item
+            android:id="@+id/nav_routine"
+            android:title="@string/routine" />
+        <item
+            android:id="@+id/nav_users"
+            android:title="@string/users" />
+    </group>
+
+</menu>

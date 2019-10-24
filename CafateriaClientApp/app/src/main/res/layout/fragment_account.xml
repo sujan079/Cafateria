@@ -94,16 +94,17 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_last_orders"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="200dp"
                     android:layout_marginTop="3dp"
                     android:layout_weight="1" />
 
                 <Button
-                    android:id="@+id/button2"
+                    android:id="@+id/view_more"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:layout_weight="1"
+                    android:onClick="startOrderHistoryIntent"
                     android:text="@string/view_more" />
 
             </LinearLayout>

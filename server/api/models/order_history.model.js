@@ -19,8 +19,9 @@ const OrderHistorySchema=mongoose.Schema({
         default:1
     },
     order_by:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'user'
+        type:String,
+        ref:'user',
+        require:true
     },
     order_date:{
         type:String,
@@ -29,6 +30,9 @@ const OrderHistorySchema=mongoose.Schema({
     order_time:{
         type:String,
         require:true
+    },
+    date:{
+        type:String
     }
 });
 

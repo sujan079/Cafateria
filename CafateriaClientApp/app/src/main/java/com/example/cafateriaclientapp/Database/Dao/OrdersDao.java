@@ -24,6 +24,9 @@ public interface OrdersDao {
     @Delete
     void  deleteOrder(DB_Orders order);
 
+    @Query("DELETE FROM orders")
+    void  deleteOrder();
+
     @Query("SELECT * FROM orders")
     List<DB_Orders> getOrders();
 

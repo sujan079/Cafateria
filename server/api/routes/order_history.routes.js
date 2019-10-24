@@ -10,7 +10,27 @@ const OrderHistory=require('../models/order_history.model');
 
 //get all order history
 router.get('/',(req,res,next)=>{
+    const user_id=req.query.user_id;
+    const date=req.query.date;
+    const limit=req.query.limit;
 
+    OrderHistory
+    .find({order_by:user_id||null})
+    .sort({'date':-1})
+    .limit(Number(limit))
+
+    .exec()
+    .then(orderHistory=>{
+        return res.status(200).json({
+            orderHistory
+        })
+    })
+    .catch(err=>{
+        console.log(err)
+        return res.status(500).json({
+            message:"Could not load Orders"
+        })
+    })
 });
 
 //add new order history
@@ -21,7 +41,7 @@ router.post('/',(req,res,next)=>{
         _id:mongoose.Types.ObjectId(),
         itemName:order.itemName,
         price:order.price,
-        order_by:order.order_by||null,
+        order_by:order.order_by||"counter",
         categories:order.categories,
         quantity:order.quantity,
         order_date:order.order_date,

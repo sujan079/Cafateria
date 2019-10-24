@@ -9,6 +9,7 @@ const menuItemRoutes=require('./api/routes/menu_items.routes');
 const todayRoutineRoutes=require('./api/routes/today_routine.routes');
 const userRoutes=require('./api/routes/user.routes');
 const orderHistoryRoutes=require('./api/routes/order_history.routes');
+const orderRoutes=require('./api/routes/orders.routes');
 
 app.use(body_parser.urlencoded({extended:true}))
 app.use(body_parser.json())
@@ -28,7 +29,7 @@ app.use('/menu-items',menuItemRoutes);
 app.use('/today-routine',todayRoutineRoutes);
 app.use('/order-history',orderHistoryRoutes);
 app.use('/users',userRoutes);
-
+app.use('/orders',orderRoutes);
 
 app.use((req,res,next)=>{
     return res.status(404).json({
