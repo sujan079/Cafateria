@@ -230,10 +230,24 @@ public class AccountFragment extends Fragment {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if(response.code()==200){
-                    User userData=response.body();
+                    final User userData=response.body();
                     List<String> infos=new ArrayList<>();
                     infos.add("ID: "+userData.getId());
                     infos.add("EMAIL: "+userData.getEmail());
+
+                    AppExecutor.getInstance().getDiskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            users=mDB.userDao().getUser();
+                            if(users.size()==0){
+                                mDB.userDao().addUser(new DB_User(
+                                        userData.getId(),
+                                        userData.getEmail()
+                                ));
+                            }
+
+                        }
+                    });
 
                     Message userInfoMsg=new Message();
                     userInfoMsg.obj=infos;
@@ -241,6 +255,12 @@ public class AccountFragment extends Fragment {
                     loadUserInfoHandler.sendMessage(userInfoMsg);
 
                 }else{
+                    AppExecutor.getInstance().getDiskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDB.userDao().delUser();
+                        }
+                    });
                     errorDialogbox("Could Not get User Data");
                 }
             }

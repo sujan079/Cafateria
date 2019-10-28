@@ -15,13 +15,21 @@ router.get('/',(req,res,next)=>{
     const limit=req.query.limit;
 
     OrderHistory
-    .find({order_by:user_id||null})
+    .find(
+        {$and:[
+            (user_id)?{order_by:user_id}:{},
+            (date)?{order_date:date}:{}
+        ]}
+
+        
+        )
     .sort({'date':-1})
     .limit(Number(limit))
 
     .exec()
     .then(orderHistory=>{
         return res.status(200).json({
+            count:orderHistory.length,
             orderHistory
         })
     })

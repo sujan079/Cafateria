@@ -55,7 +55,7 @@ router.post("/",(req,res,next)=>{
     })
 
     
-    if(item.itemName==''|| item.price<=0 || item.categories.length<=0){
+    if(item.itemName==''|| item.price<0 || item.categories.length<=0){
         return res.status(500).json({
             message:"Invalid Field Data"
         })
@@ -71,6 +71,7 @@ router.post("/",(req,res,next)=>{
             })
         })
         .catch(err=>{
+            console.log(err)
             return res.status(500).json({
                 message:"Error Could Not add Item"
             })
@@ -108,7 +109,7 @@ router.patch("/:id",(req,res,next)=>{
     console.log(updatedItem)
     MenuItem.update({_id:id},{$set:{...updatedItem}})
     .exec()
-    .then(()=>{
+    .then((item)=>{
         if(item==null){
             return res.status(500).json({
                 message:"No Item with id"+id
@@ -119,7 +120,10 @@ router.patch("/:id",(req,res,next)=>{
         })
     })
     .catch(err=>{
+        console.log(err)
+
         return res.status(500).json({
+            
             message:"Could not update item id:"+id
         })
     })
@@ -128,7 +132,7 @@ router.patch("/:id",(req,res,next)=>{
 //delete menu item
 router.delete("/:id",(req,res,next)=>{
     const id=req.params.id
-    MenuItem.remove({_id:id})
+    MenuItem.deleteOne({_id:id})
     .exec()
     .then(()=>{
         return res.status(200).json({

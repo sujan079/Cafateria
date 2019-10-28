@@ -24,7 +24,12 @@ router.post('/',(req,res,next)=>{
                 message:"No user with such id"
             })
         }else{
-
+            if(!user.active){
+                //302 is a error for not active user
+                return res.status(302).json({
+                    message:"Account Not active"
+                })
+            }
             var today = new Date();
             var dd = String(today.getDate()).padStart(2, '0');
             var mm = String(today.getMonth() + 1).padStart(2, '0');

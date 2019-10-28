@@ -35,7 +35,22 @@ const upload=multer(
     
 
 
+router.get('/',(req,res,next)=>{
+    User.find()
+    .exec()
+    .then(db_users=>{
+        return res.status(200).json({
+            count:db_users.length,
+            users:db_users
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            message:"Somthing went wrong"
+        })
+    })
 
+})
 
 router.post('/',(req,res,next)=>{
     const user=req.body;
@@ -94,6 +109,48 @@ router.get('/:id',(req,res,next)=>{
     .catch(err=>{
         return res.status(500).json({
             message:"Invalid User ID"
+        })
+    })
+})
+
+router.patch('/:id',(req,res,next)=>{
+    const id=req.params.id;
+    const updateItem=req.body;
+    User.findById(id)
+    .exec()
+    .then(user=>{
+        if(user=null){
+            return res.status(404).json({
+                message:"User Not found"
+            })
+        }
+        return User.updateOne({_id:id},{$set:{...updateItem}}).exec()
+    })
+    .then(updated_usr=>{
+        return res.status(200).json({
+            message:"user updated"
+        })
+    })
+    .catch(err=>{
+        return res.status(404).json({
+            message:"Invalid user id"
+        })
+    })
+})
+
+router.delete('/:id',(req,res,next)=>{
+    const id=req.params.id;
+
+    User.deleteMany({_id:id})
+    .exec()
+    .then(()=>{
+        return res.status(200).json({
+            message:"delete Success"
+        })
+    })
+    .catch(err=>{
+        return res.status(500).json({
+            message:"Could Not Delete User,No id"
         })
     })
 })
