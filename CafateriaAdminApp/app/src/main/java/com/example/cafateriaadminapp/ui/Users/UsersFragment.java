@@ -1,6 +1,7 @@
 package com.example.cafateriaadminapp.ui.Users;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +17,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cafateriaadminapp.Adapter.UsersAdapter;
 import com.example.cafateriaadminapp.Network.Retrofit.Api.UsersApiClient;
+import com.example.cafateriaadminapp.Network.Retrofit.Model.OrderHistory.OrderHistory;
 import com.example.cafateriaadminapp.Network.Retrofit.Model.Users.User;
 import com.example.cafateriaadminapp.Network.Retrofit.Model.Users.Users;
 import com.example.cafateriaadminapp.Network.Retrofit.RetrofitClient;
+import com.example.cafateriaadminapp.OrderHistoryActivity;
 import com.example.cafateriaadminapp.R;
 
 import java.util.List;
@@ -41,6 +44,8 @@ public class UsersFragment extends Fragment {
     private AlertDialog errorDialog, fetchingData;
 
     private Context context;
+
+    public static int ORDER_HISTORY_REQUEST_CODE=111;
 
 
     @Nullable
@@ -75,7 +80,9 @@ public class UsersFragment extends Fragment {
 
             @Override
             public void seeOrders(String id) {
-
+                Intent orderHistoryIntent=new Intent(context, OrderHistoryActivity.class);
+                orderHistoryIntent.putExtra(OrderHistoryActivity.EXTRA_USER_ID,id);
+                startActivityForResult(orderHistoryIntent,ORDER_HISTORY_REQUEST_CODE);
             }
 
             @Override

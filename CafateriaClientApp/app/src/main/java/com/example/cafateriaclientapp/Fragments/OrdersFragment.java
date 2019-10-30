@@ -155,6 +155,10 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
                 if(response.code()==200){
                     deletAllOrder();
                      fetchingData.cancel();
+                }else if(response.code()==302) {
+                    Message message=new Message();
+                    message.obj="Could Not Register Order,Your Account IS NOT Active";
+                    showErrorDialogHandler.sendMessage(message);
                 }else {
                     Message message=new Message();
                     message.obj="Could Not Register Order";

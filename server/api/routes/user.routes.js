@@ -39,6 +39,11 @@ router.get('/',(req,res,next)=>{
     User.find()
     .exec()
     .then(db_users=>{
+        db_users.push({
+            _id:"counter",
+            email:'',
+            active:true
+        })
         return res.status(200).json({
             count:db_users.length,
             users:db_users
@@ -102,7 +107,8 @@ router.get('/:id',(req,res,next)=>{
         }else{
             return res.status(200).json({
                 _id:user._id,
-                email:user.email
+                email:user.email,
+                active:user.active
             })
         }
     })

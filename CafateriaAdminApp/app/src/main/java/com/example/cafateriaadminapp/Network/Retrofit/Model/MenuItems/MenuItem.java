@@ -18,6 +18,7 @@ public class MenuItem {
     @SerializedName("categories")
     private List<String> categories;
 
+
     public MenuItem(String itemName, Double price, List<String> categories) {
         this.itemName = itemName;
         this.price = price;
@@ -28,16 +29,16 @@ public class MenuItem {
         return itemName;
     }
 
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
     }
 
     public Double getPrice() {

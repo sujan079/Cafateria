@@ -20,6 +20,12 @@ public class History {
 
     @SerializedName("quantity")
     private Double quantity;
+    @SerializedName("order_by")
+    private String orderBy;
+    @SerializedName("order_date")
+    private String order_date;
+    @SerializedName("order_time")
+    private String order_time;
 
     public String getOrderBy() {
         return orderBy;
@@ -28,16 +34,6 @@ public class History {
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
     }
-
-    @SerializedName("order_by")
-    private String orderBy;
-
-    @SerializedName("order_date")
-    private String order_date;
-
-    @SerializedName("order_time")
-    private String order_time;
-
 
     public String get_id() {
         return _id;

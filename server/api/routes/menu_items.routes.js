@@ -9,6 +9,7 @@ const MenuItemCategories=require('../models/menu_item_categories.model');
 router.get("/",(req,res,next)=>{
     MenuItem
     .find()
+    .sort({'itemName':-1})
     .exec()
     .then(menuItems=>{
         return res.status(200).json({

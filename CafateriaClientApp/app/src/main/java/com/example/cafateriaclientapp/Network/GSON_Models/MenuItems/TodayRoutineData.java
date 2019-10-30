@@ -9,8 +9,8 @@ public class TodayRoutineData {
     @SerializedName("categories")
     private List<String> categories;
 
-    @SerializedName("menu_items")
-    private  List<MenuItem> menuItems;
+    @SerializedName("routineItems")
+    private List<MenuItem> routineItems;
 
     public List<String> getCategories() {
         return categories;
@@ -20,11 +20,11 @@ public class TodayRoutineData {
         this.categories = categories;
     }
 
-    public List<MenuItem> getMenuItems() {
-        return menuItems;
+    public List<MenuItem> getRoutineItems() {
+        return routineItems;
     }
 
-    public void setMenuItems(List<MenuItem> menuItems) {
-        this.menuItems = menuItems;
+    public void setRoutineItems(List<MenuItem> routineItems) {
+        this.routineItems = routineItems;
     }
 }

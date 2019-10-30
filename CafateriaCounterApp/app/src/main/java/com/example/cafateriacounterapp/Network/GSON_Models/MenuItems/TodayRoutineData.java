@@ -10,7 +10,7 @@ public class TodayRoutineData {
     @SerializedName("categories")
     private List<String> categories;
 
-    @SerializedName("menu_items")
+    @SerializedName("routineItems")
     private List<MenuItem> menuItems;
 
     public List<String> getCategories() {

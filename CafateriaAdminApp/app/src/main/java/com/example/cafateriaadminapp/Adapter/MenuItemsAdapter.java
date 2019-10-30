@@ -47,8 +47,8 @@ public class MenuItemsAdapter extends RecyclerView.Adapter<MenuItemsAdapter.Menu
     }
 
      class MenuItemsViewHolder extends RecyclerView.ViewHolder{
-        private TextView mTvItemName,mTvItemCategory,mTvItemPrice;
-        private Button ivRemove;
+         private TextView mTvItemName, mTvItemCategory, mTvItemPrice;
+         private Button ivRemove;
         private Button updateBtn;
 
         public MenuItemsViewHolder(@NonNull View itemView) {
@@ -91,8 +91,9 @@ public class MenuItemsAdapter extends RecyclerView.Adapter<MenuItemsAdapter.Menu
         }
     }
 
-    public interface OnMenuItemClickListner{
+    public interface OnMenuItemClickListner {
         void removeMenuItem(MenuItem menuItem);
+
         void updateMenuItem(MenuItem menuItem);
     }
 }

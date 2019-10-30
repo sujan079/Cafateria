@@ -12,7 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".OrderHistoryActivity"></activity>
+        <activity android:name=".SelectRoutineItemActivity"></activity>
+        <activity android:name=".RoutineItemActivity" />
+        <activity android:name=".OrderHistoryActivity" />
         <activity android:name=".AddUpdateMenuItem" />
         <activity
             android:name=".MainActivity"

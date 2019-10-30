@@ -10,17 +10,9 @@ public class User {
     @SerializedName("email")
     private String email;
 
-    @SerializedName("displayName")
-    private String displayName;
+    @SerializedName("active")
+    private boolean active;
 
-    @SerializedName("phoneNumber")
-    private String phoneNumber;
-
-    @SerializedName("address")
-    private String address;
-
-    @SerializedName("profile_img")
-    private String profile_img;
 
     public User(String id, String email) {
         this.id = id;
@@ -42,36 +34,13 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+    
 
-    public String getDisplayName() {
-        return displayName;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getProfile_img() {
-        return profile_img;
-    }
-
-    public void setProfile_img(String profile_img) {
-        this.profile_img = profile_img;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

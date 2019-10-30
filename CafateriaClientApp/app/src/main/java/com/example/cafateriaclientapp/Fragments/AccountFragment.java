@@ -234,6 +234,8 @@ public class AccountFragment extends Fragment {
                     List<String> infos=new ArrayList<>();
                     infos.add("ID: "+userData.getId());
                     infos.add("EMAIL: "+userData.getEmail());
+                    String status=userData.isActive()?("Active"):("Not Active");
+                    infos.add("Status:"+status);
 
                     AppExecutor.getInstance().getDiskIO().execute(new Runnable() {
                         @Override

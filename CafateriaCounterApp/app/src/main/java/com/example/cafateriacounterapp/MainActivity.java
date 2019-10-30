@@ -47,89 +47,85 @@ import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity implements MenuItemsActionListner, CategoriesItemActionListner {
 
-    private String TAG=this.getClass().getSimpleName();
-    private AlertDialog fetchingData,errorDialog;
-
+    private static boolean showError = true;
+    private static boolean serverConn = true;
+    private String TAG = this.getClass().getSimpleName();
+    private AlertDialog fetchingData, errorDialog;
     private RecyclerView rvCategories;
     private RecyclerView.LayoutManager categoriesLayoutManager;
     private CategoriesAdapter categoriesAdapter;
-
     private RecyclerView rvMenuItems;
     private RecyclerView.LayoutManager menuItemsLayoutManager;
     private MenuItemsAdapter menuItemsAdapter;
-
-    private String SELECTED_CATEGORY="ALL";
-
+    private String SELECTED_CATEGORY = "ALL";
     private CafateriaDatabase mDB;
-
-    private static boolean showError=true;
-    private static boolean serverConn=true;
-
     //Handlers
-    private Handler loadMenuItemDataFromDataBaseHandler=new Handler(){
+    private Handler loadMenuItemDataFromDataBaseHandler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            List<DB_MenuItem> menuItems= (List<DB_MenuItem>) msg.obj;
+            List<DB_MenuItem> menuItems = (List<DB_MenuItem>) msg.obj;
             loadMenuItems(menuItems);
         }
     };
 
     //Handlers
-    private  Handler loadCategoryDataFromDataBaseHandler=new Handler(){
+    private Handler loadCategoryDataFromDataBaseHandler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            List<DB_Category> categories= (List<DB_Category>) msg.obj;
+            List<DB_Category> categories = (List<DB_Category>) msg.obj;
             loadCategories(categories);
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
 
-        rvCategories=findViewById(R.id.rv_categories);
-        categoriesAdapter=new CategoriesAdapter(new ArrayList<DB_Category>(),this);
-        categoriesLayoutManager=new LinearLayoutManager(this);
+        rvCategories = findViewById(R.id.rv_categories);
+        categoriesAdapter = new CategoriesAdapter(new ArrayList<DB_Category>(), this);
+        categoriesLayoutManager = new LinearLayoutManager(this);
 
         rvCategories.setAdapter(categoriesAdapter);
         rvCategories.setLayoutManager(categoriesLayoutManager);
 
-        rvMenuItems=findViewById(R.id.rv_menu_items);
-        menuItemsAdapter=new MenuItemsAdapter(new ArrayList<DB_MenuItem>(),this);
-        menuItemsLayoutManager=new GridLayoutManager(this,4);
+        rvMenuItems = findViewById(R.id.rv_menu_items);
+        menuItemsAdapter = new MenuItemsAdapter(new ArrayList<DB_MenuItem>(), this);
+        menuItemsLayoutManager = new GridLayoutManager(this, 4);
 
         rvMenuItems.setAdapter(menuItemsAdapter);
         rvMenuItems.setLayoutManager(menuItemsLayoutManager);
 
-        mDB=CafateriaDatabase.getInstance(getApplicationContext());
+        mDB = CafateriaDatabase.getInstance(getApplicationContext());
 
 
         loadDataFromSource();
         startUpload();
     }
 
-    public void startUpload(){
-        ComponentName componentName=new ComponentName(this, UploadHistoryJobService.class);
+    public void startUpload() {
+        ComponentName componentName = new ComponentName(this, UploadHistoryJobService.class);
 
-        JobInfo info=new JobInfo.Builder(UploadHistoryJobService.UploadHistoryJobServiceID,componentName)
+        JobInfo info = new JobInfo.Builder(UploadHistoryJobService.UploadHistoryJobServiceID, componentName)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .setPersisted(true)
-                .setPeriodic(15*60*1000)
+                .setPeriodic(15 * 60 * 1000)
                 .build();
 
-        JobScheduler scheduler= (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
 
         scheduler.schedule(info);
 
     }
 
-    public void loadDataFromSource(){
-        if(isNetworkConnected()){
+    public void loadDataFromSource() {
+
+        if (isNetworkConnected()) {
             loadDataFromNetwork(SELECTED_CATEGORY);
-        }else{
+        } else {
             loadFromDataBase(SELECTED_CATEGORY);
         }
     }
@@ -141,38 +137,42 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
     }
 
 
-    public void loadDataFromNetwork(String category){
-        if(serverConn){
+    public void loadDataFromNetwork(String category) {
+        if (category.equals("ALL")) {
+            category = null;
+        }
+
+        if (serverConn) {
             showLoadingDialogBox();
         }
 
-        Retrofit retrofit= RetrofitClient.getInstance();
+        Retrofit retrofit = RetrofitClient.getInstance();
 
-        TodayRoutineApi todayRoutineApi =retrofit.create(TodayRoutineApi.class);
+        TodayRoutineApi todayRoutineApi = retrofit.create(TodayRoutineApi.class);
 
-        Call<TodayRoutineData> counterDataCall= todayRoutineApi.getCounterData(category);
+        Call<TodayRoutineData> counterDataCall = todayRoutineApi.getCounterData(category);
 
         counterDataCall.enqueue(new Callback<TodayRoutineData>() {
             @Override
             public void onResponse(Call<TodayRoutineData> call, Response<TodayRoutineData> response) {
                 hideDialogBox(fetchingData);
-                TodayRoutineData todayRoutineData =response.body();
+                TodayRoutineData todayRoutineData = response.body();
 
                 saveToDataBase(todayRoutineData.getMenuItems(), todayRoutineData.getCategories());
 
-                showError=true;
-                serverConn=true;
+                showError = true;
+                serverConn = true;
             }
 
             @Override
             public void onFailure(Call<TodayRoutineData> call, Throwable t) {
-                if(showError){
+                if (showError) {
                     errorDialogbox(t.getMessage());
                     hideDialogBox(fetchingData);
 
                 }
-                serverConn=false;
-                showError=false;
+                serverConn = false;
+                showError = false;
                 loadFromDataBase(SELECTED_CATEGORY);
             }
         });
@@ -180,53 +180,54 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
 
     }
 
-    public void showLoadingDialogBox(){
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        View view= LayoutInflater.from(this).inflate(R.layout.info_dialog_box,null,false);
+    public void showLoadingDialogBox() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.info_dialog_box, null, false);
         builder.setView(view);
-        fetchingData=builder.create();
+        fetchingData = builder.create();
         fetchingData.show();
 
     }
 
-    public void errorDialogbox(String error){
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        View view=LayoutInflater.from(this).inflate(R.layout.error_dialog_box,null,false);
+    public void errorDialogbox(String error) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.error_dialog_box, null, false);
 
-        TextView errorTextView= view.findViewById(R.id.tv_error);
+        TextView errorTextView = view.findViewById(R.id.tv_error);
         errorTextView.setText(error);
         builder.setView(view);
-        errorDialog=builder.create();
+        errorDialog = builder.create();
         errorDialog.show();
     }
-    public void hideDialogBox(AlertDialog alertDialog){
+
+    public void hideDialogBox(AlertDialog alertDialog) {
         alertDialog.cancel();
     }
 
-    public void loadCategories(List<DB_Category> categories){
-        categories.add(0,new DB_Category("ALL"));
+    public void loadCategories(List<DB_Category> categories) {
+        categories.add(0, new DB_Category("ALL"));
         categoriesAdapter.setCategories(categories);
         categoriesAdapter.notifyDataSetChanged();
     }
 
-    public void loadMenuItems(List<DB_MenuItem> menuItems){
+    public void loadMenuItems(List<DB_MenuItem> menuItems) {
         menuItemsAdapter.setMenuItemList(menuItems);
         menuItemsAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onCategoryItemClicked(DB_Category category) {
-        SELECTED_CATEGORY=category.getCategory();
+        SELECTED_CATEGORY = category.getCategory();
         loadDataFromSource();
     }
 
     @Override
     public void onMenuItemClick(DB_MenuItem menuItem) {
-        PrinterHelper printerHelper=new PrinterHelper("10.10.100.254");
+        PrinterHelper printerHelper = new PrinterHelper("10.10.100.254");
 
-        String[] date= DateHelper.getDateAndTime(new Date());
+        String[] date = DateHelper.getDateAndTime(new Date());
 
-        if(true /*PrinterHelper.connTest()*/){
+        if (true /*PrinterHelper.connTest()*/) {
             print(menuItem);
             saveOrderHistory(new DB_Orders_History(
                     menuItem.getItemName(),
@@ -236,12 +237,12 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
                     date[1],
                     1
             ));
-        }else{
-            Toast.makeText(this,"Print Failed",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Print Failed", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void saveOrderHistory(final DB_Orders_History orders_history){
+    public void saveOrderHistory(final DB_Orders_History orders_history) {
         AppExecutor.getInstance().getDiskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -250,20 +251,20 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
         });
     }
 
-    public void print(DB_MenuItem menuItem){
+    public void print(DB_MenuItem menuItem) {
         //TODO:Printing Task
     }
 
-    public void saveToDataBase(final List<MenuItem> menuItems, final List<String>categories){
+    public void saveToDataBase(final List<MenuItem> menuItems, final List<String> categories) {
         AppExecutor.getInstance().getDiskIO().execute(new Runnable() {
             @Override
             public void run() {
                 mDB.menuItemDao().deleteMenuItems();
                 mDB.categoriesDao().deleteCategories();
-                for(MenuItem item:menuItems){
-                    mDB.menuItemDao().addMenuItem(new DB_MenuItem(item.getItemName(),item.getCategories(),item.getPrice()));
+                for (MenuItem item : menuItems) {
+                    mDB.menuItemDao().addMenuItem(new DB_MenuItem(item.getItemName(), item.getCategories(), item.getPrice()));
                 }
-                for(String category:categories){
+                for (String category : categories) {
                     mDB.categoriesDao().addCategory(new DB_Category(category));
                 }
                 loadFromDataBase(SELECTED_CATEGORY);
@@ -272,25 +273,25 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
         });
     }
 
-    public void loadFromDataBase(final String category){
+    public void loadFromDataBase(final String category) {
         AppExecutor.getInstance().getDiskIO().execute(new Runnable() {
             @Override
             public void run() {
                 List<DB_MenuItem> menuItems;
-                if(category=="ALL"){
-                    menuItems=mDB.menuItemDao().getAllMenuItems();
+                if (category == "ALL") {
+                    menuItems = mDB.menuItemDao().getAllMenuItems();
 
-                }else{
-                    menuItems=mDB.menuItemDao().getAllMenuByCategory(category);
+                } else {
+                    menuItems = mDB.menuItemDao().getAllMenuByCategory(category);
 
                 }
-                List<DB_Category> categories=mDB.categoriesDao().getAllCategories();
+                List<DB_Category> categories = mDB.categoriesDao().getAllCategories();
 
-                Message categoryMessage=new Message();
-                categoryMessage.obj=categories;
+                Message categoryMessage = new Message();
+                categoryMessage.obj = categories;
 
-                Message menuItemMessage=new Message();
-                menuItemMessage.obj=menuItems;
+                Message menuItemMessage = new Message();
+                menuItemMessage.obj = menuItems;
 
                 loadCategoryDataFromDataBaseHandler.sendMessage(categoryMessage);
                 loadMenuItemDataFromDataBaseHandler.sendMessage(menuItemMessage);

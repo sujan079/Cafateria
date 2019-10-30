@@ -20,4 +20,5 @@
     <string name="price">Price</string>
     <string name="status">Status</string>
     <string name="view_orders">View Orders</string>
+    <string name="done">Done</string>
 </resources>
