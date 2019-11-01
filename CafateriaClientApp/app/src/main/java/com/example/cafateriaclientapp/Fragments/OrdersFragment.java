@@ -28,9 +28,15 @@ import com.example.cafateriaclientapp.Network.GSON_Models.MenuItems.MenuItem;
 import com.example.cafateriaclientapp.Network.GSON_Models.Orders.Order;
 import com.example.cafateriaclientapp.Network.RetrofitClient;
 import com.example.cafateriaclientapp.R;
+import com.example.cafateriaclientapp.Socket.PrintSocket;
+import com.github.nkzawa.socketio.client.Socket;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,12 +56,12 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
 
     private Button orderBtn;
 
-    private static AlertDialog errorDialog,fetchingData;
+    private static AlertDialog errorDialog, fetchingData;
 
-
+    private Socket socket;
     //handlers
 
-    private Handler showErrorDialogHandler=new Handler(){
+    private Handler showErrorDialogHandler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -66,11 +72,11 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
     };
 
 
-    private Handler loadOrderItemsHandler=new Handler(){
+    private Handler loadOrderItemsHandler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            List<DB_Orders> orders= (List<DB_Orders>) msg.obj;
+            List<DB_Orders> orders = (List<DB_Orders>) msg.obj;
             ordersAdapter.setOrdersList(orders);
             ordersAdapter.notifyDataSetChanged();
         }
@@ -79,8 +85,8 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView=inflater.inflate(R.layout.fragment_orders,container,false);
-        context=rootView.getContext();
+        View rootView = inflater.inflate(R.layout.fragment_orders, container, false);
+        context = rootView.getContext();
         return rootView;
     }
 
@@ -88,7 +94,7 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        orderBtn=view.findViewById(R.id.btn_send_order);
+        orderBtn = view.findViewById(R.id.btn_send_order);
         orderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,90 +103,106 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
         });
 
 
-        mDB=CafateriaDatabase.getInstance(context);
-        retrofit=new RetrofitClient().getINSTANCE();
+        mDB = CafateriaDatabase.getInstance(context);
+        retrofit = new RetrofitClient().getINSTANCE();
 
-        rvOrders=view.findViewById(R.id.rv_orders);
-        ordersAdapter=new OrdersAdapter(new ArrayList<DB_Orders>(),this);
-        layoutManager=new GridLayoutManager(context,2);
+        rvOrders = view.findViewById(R.id.rv_orders);
+        ordersAdapter = new OrdersAdapter(new ArrayList<DB_Orders>(), this);
+        layoutManager = new GridLayoutManager(context, 2);
 
         rvOrders.setAdapter(ordersAdapter);
         rvOrders.setLayoutManager(layoutManager);
 
         getAllOrders();
 
+        PrintSocket printSocket = new PrintSocket();
+
+        socket = printSocket.getSocket();
+        socket.connect();
+
+
     }
 
-    public void sendOrder(){
+    public void sendOrder() {
         showLoadingDialogBox();
         AppExecutor.getInstance().getDiskIO().execute(new Runnable() {
             @Override
             public void run() {
-                List<DB_User> users=mDB.userDao().getUser();
-                if(users.size()>0){
-                    DB_User currentUser=users.get(0);
-                    List<DB_Orders> orders=mDB.ordersDao().getOrders();
+                List<DB_User> users = mDB.userDao().getUser();
+                if (users.size() > 0) {
+                    DB_User currentUser = users.get(0);
+                    List<DB_Orders> orders = mDB.ordersDao().getOrders();
 
-                    List<MenuItem> ordItems=new ArrayList<>();
+                    List<MenuItem> ordItems = new ArrayList<>();
 
-                    for (DB_Orders ord:orders) {
+
+                    for (DB_Orders ord : orders) {
+
                         ordItems.add(new MenuItem(
-                           ord.getItemId(),
-                           ord.getItemName(),
-                           ord.getCategories(),
-                           ord.getPrice(),
-                           ord.getQuantity()
+                                ord.getItemId(),
+                                ord.getItemName(),
+                                ord.getCategories(),
+                                ord.getPrice(),
+                                ord.getQuantity()
                         ));
                     }
 
-                    sendOrderToServer(new Order(currentUser.getId(),ordItems));
 
-                }else{
-                    Message message=new Message();
-                    message.obj="Error No User Found.Please Login";
+                    sendOrderToServer(new Order(currentUser.getId(), currentUser.getEmail(), ordItems));
+
+                } else {
+                    Message message = new Message();
+                    message.obj = "Error No User Found.Please Login";
                     showErrorDialogHandler.sendMessage(message);
                 }
             }
         });
     }
 
-    public void sendOrderToServer(Order orders){
-        OrdersApi ordersApi =retrofit.create(OrdersApi.class);
+    public void sendOrderToServer(final Order orders) {
+        OrdersApi ordersApi = retrofit.create(OrdersApi.class);
 
-        Call<Order> ordersHistoryCall= ordersApi.addOrderToHisory(orders);
+        Call<Order> ordersHistoryCall = ordersApi.addOrderToHisory(orders);
 
         ordersHistoryCall.enqueue(new Callback<Order>() {
             @Override
             public void onResponse(Call<Order> call, Response<Order> response) {
-                if(response.code()==200){
+                if (response.code() == 200) {
                     deletAllOrder();
-                     fetchingData.cancel();
-                }else if(response.code()==302) {
-                    Message message=new Message();
-                    message.obj="Could Not Register Order,Your Account IS NOT Active";
+
+
+                    orders.setPrintId(new Random().nextInt((int) new Date().getTime()));
+                    String jsonObject = new Gson().toJson(orders);
+
+                    socket.emit("print", jsonObject);
+                    fetchingData.cancel();
+                } else if (response.code() == 302) {
+                    Message message = new Message();
+                    message.obj = "Could Not Register Order,Your Account IS NOT Active";
                     showErrorDialogHandler.sendMessage(message);
-                }else {
-                    Message message=new Message();
-                    message.obj="Could Not Register Order";
+                } else {
+                    Message message = new Message();
+                    message.obj = "Could Not Register Order";
                     showErrorDialogHandler.sendMessage(message);
                 }
             }
 
             @Override
             public void onFailure(Call<Order> call, Throwable t) {
-                Message message=new Message();
-                message.obj=t.getMessage();
+                Message message = new Message();
+                message.obj = t.getMessage();
                 showErrorDialogHandler.sendMessage(message);
             }
         });
     }
-    public void getAllOrders(){
+
+    public void getAllOrders() {
         AppExecutor.getInstance().getDiskIO().execute(new Runnable() {
             @Override
             public void run() {
-                List<DB_Orders> orders=mDB.ordersDao().getOrders();
-                Message orderMsg=new Message();
-                orderMsg.obj=orders;
+                List<DB_Orders> orders = mDB.ordersDao().getOrders();
+                Message orderMsg = new Message();
+                orderMsg.obj = orders;
 
                 loadOrderItemsHandler.sendMessage(orderMsg);
 
@@ -189,27 +211,25 @@ public class OrdersFragment extends Fragment implements OrdersActionListener {
     }
 
 
-
-    public void showLoadingDialogBox(){
-        AlertDialog.Builder builder=new AlertDialog.Builder(context);
-        View view= LayoutInflater.from(context).inflate(R.layout.info_dialog_box,null,false);
+    public void showLoadingDialogBox() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.info_dialog_box, null, false);
         builder.setView(view);
-        fetchingData=builder.create();
+        fetchingData = builder.create();
         fetchingData.show();
 
     }
 
-    public void errorDialogbox(String error){
+    public void errorDialogbox(String error) {
 
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.error_dialog_box, null, false);
 
-        AlertDialog.Builder builder=new AlertDialog.Builder(context);
-        View view=LayoutInflater.from(context).inflate(R.layout.error_dialog_box,null,false);
-
-        TextView errorTextView= view.findViewById(R.id.tv_error);
+        TextView errorTextView = view.findViewById(R.id.tv_error);
         errorTextView.setText(error);
         builder.setView(view);
-        errorDialog=builder.create();
+        errorDialog = builder.create();
         errorDialog.show();
     }
 

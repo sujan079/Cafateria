@@ -16,7 +16,7 @@ app.use(body_parser.json())
 
 app.use(morgan("dev"));
 
-mongoose.connect(`mongodb+srv://${process.env.MONGODB_ATLAS_USER}:${process.env.MONGODB_ATLAS_PW}@cafateriacluster-lvoze.mongodb.net/cafateria?retryWrites=true&w=majority`,
+mongoose.connect(`mongodb+srv://sujan079:9JHGvzEVyjIcIbXW@cafateriacluster-lvoze.mongodb.net/cafateria?retryWrites=true&w=majority`,
 {useUnifiedTopology:true,useNewUrlParser:true})
 .then(()=>{
     console.log("Database Connect Success")

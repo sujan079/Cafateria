@@ -23,25 +23,26 @@ router.get('/',(req,res,next)=>{
     if(selectedDay){
         day=selectedDay
     }else{
-        switch(new Date().getDay()+1){
-            case 1:
+        switch(new Date().getDay()){
+            case 0:
                 day="SUNDAY"
                 break;
-            case 2:
+            case 1:
                 day="MONDAY"
                 break;
-            case 3:
+            case 2:
                 day="TUESDAY"
                 break;
-            case 4:
+            case 3:
                 day="WEDNESDAY";
                 break;
-            case 5:
+            case 4:
                 day="THURSDAY";
                 break;
-            case 6:
+            case 5:
                 day="FRIDAY";
-            case 7:
+                break;
+            case 6:
                 day="SATURDAY";
                 break;    
         }

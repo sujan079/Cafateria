@@ -4,11 +4,14 @@ const mongoose=require('mongoose');
 const router=express.Router();
 
 const OrderHistory=require('../models/order_history.model');
+const Order=require('../models/orders.model');
 const User=require('../models/user.model');
 
 
 router.post('/',(req,res,next)=>{
     const ord=req.body;
+
+    console.log(ord)
 
     if(!ord.user || ord.menu_items.length<=0){
        return res.status(500).json({
@@ -49,10 +52,13 @@ router.post('/',(req,res,next)=>{
                     order_time:today.getHours()+":"+today.getMinutes()+":"+today.getSeconds(),
                     date:new Date().getTime()
                 });
+                
+            
 
                 orderHistory.save()
                 .then(()=>{
                     console.log("order saved")
+
                 })
                 .catch(err=>{
                     console.log(err)

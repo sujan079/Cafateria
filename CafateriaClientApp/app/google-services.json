@@ -8,20 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:432243258845:android:a4daac43119719e441b234",
+        "mobilesdk_app_id": "1:432243258845:android:04c293ea50301f0741b234",
         "android_client_info": {
           "package_name": "com.example.cafateriaclientapp"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "432243258845-l7oadh80t0bft1meld938l2vllraneg3.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.cafateriaclientapp",
-            "certificate_hash": "7627d6480f498ae0e747e6223850669f4c4b7982"
-          }
-        },
         {
           "client_id": "432243258845-8124o4vjdc0n29ti0str78konmim2ahe.apps.googleusercontent.com",
           "client_type": 3
