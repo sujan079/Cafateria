@@ -20,11 +20,13 @@ io.on('connection',(socket)=>{
     socket.on("print",(data)=>{
         console.log("print command"+data);
         
+        
         socket.broadcast.emit('print',data);
 
     })
 
     socket.on('disconnect',()=>{
+        console.log("disconnect socket"+socket.id)
         socket.disconnect(true)
         
     })

@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 
 public class PrintSocket {
 
-    public static String BASE_URL = "http://192.168.0.3:8000";
+    public static String BASE_URL = "https://cafateriaapp.herokuapp.com/";
 
     private Socket mSocket;
 

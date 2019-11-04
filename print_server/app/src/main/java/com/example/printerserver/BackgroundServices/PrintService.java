@@ -25,7 +25,6 @@ import com.example.printerserver.Socket.PrintSocket;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 
 import java.util.List;
 
@@ -45,17 +44,21 @@ public class PrintService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+
         PrintSocket printSocket = new PrintSocket();
 
         socket = printSocket.getSocket();
+        socket.on("print", onPrintCommand);
+
         socket.connect();
 
-        socket.on("print", onPrintCommand);
     }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         mDB = RoomDatabase.getInstance(getApplicationContext());
 
         Intent notificationIntent = new Intent(this, MainActivity.class);

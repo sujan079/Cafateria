@@ -8,7 +8,7 @@ import androidx.room.Room;
 import com.example.printerserver.Database.Dao.PrinterDao;
 import com.example.printerserver.Database.Models.IpAdders;
 
-@Database(entities = {IpAdders.class}, version = 1)
+@Database(entities = {IpAdders.class}, version = 1,exportSchema = false)
 public abstract class RoomDatabase extends androidx.room.RoomDatabase {
 
     private static RoomDatabase INSTANCE;

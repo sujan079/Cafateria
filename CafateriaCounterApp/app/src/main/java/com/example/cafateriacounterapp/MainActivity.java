@@ -33,7 +33,7 @@ import com.example.cafateriacounterapp.Network.API.TodayRoutineApi;
 import com.example.cafateriacounterapp.Network.GSON_Models.MenuItems.TodayRoutineData;
 import com.example.cafateriacounterapp.Network.GSON_Models.MenuItems.MenuItem;
 import com.example.cafateriacounterapp.Network.RetrofitClient;
-import com.example.cafateriacounterapp.Printer.PrinterHelper;
+import com.example.cafateriacounterapp.PrinterControl.BixolonPrinter;
 import com.example.cafateriacounterapp.Utils.DateHelper;
 
 import java.util.ArrayList;
@@ -59,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
     private MenuItemsAdapter menuItemsAdapter;
     private String SELECTED_CATEGORY = "ALL";
     private CafateriaDatabase mDB;
+
+    private static BixolonPrinter bixolonPrinter;
+
     //Handlers
     private Handler loadMenuItemDataFromDataBaseHandler = new Handler() {
         @Override
@@ -104,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
 
         loadDataFromSource();
         startUpload();
+
+        bixolonPrinter = new BixolonPrinter(this);
     }
 
     public void startUpload() {
@@ -223,11 +228,10 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
 
     @Override
     public void onMenuItemClick(DB_MenuItem menuItem) {
-        PrinterHelper printerHelper = new PrinterHelper("10.10.100.254");
 
         String[] date = DateHelper.getDateAndTime(new Date());
 
-        if (true /*PrinterHelper.connTest()*/) {
+        if (true) {
             print(menuItem);
             saveOrderHistory(new DB_Orders_History(
                     menuItem.getItemName(),
@@ -252,7 +256,21 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
     }
 
     public void print(DB_MenuItem menuItem) {
+        String[] date = DateHelper.getDateAndTime(new Date());
+
         //TODO:Printing Task
+        MainActivity.getPrinterInstance().printText("Welcome \n", BixolonPrinter.ALIGNMENT_CENTER, BixolonPrinter.ATTRIBUTE_NORMAL, 1);
+        MainActivity.getPrinterInstance().printText("To\n", BixolonPrinter.ALIGNMENT_CENTER, BixolonPrinter.ATTRIBUTE_NORMAL, 1);
+
+        MainActivity.getPrinterInstance().printText("Southwestern Cafeteria\n", BixolonPrinter.ALIGNMENT_CENTER, BixolonPrinter.ATTRIBUTE_NORMAL, 1);
+
+
+        MainActivity.getPrinterInstance().printText(menuItem.getItemName() + "\n\n", BixolonPrinter.ALIGNMENT_CENTER, BixolonPrinter.ATTRIBUTE_BOLD, 3);
+
+        MainActivity.getPrinterInstance().printText(date[0] + "\t\t\t", BixolonPrinter.ALIGNMENT_LEFT, BixolonPrinter.ATTRIBUTE_NORMAL, 1);
+
+        MainActivity.getPrinterInstance().printText(date[1] + "\n\n", BixolonPrinter.ALIGNMENT_RIGHT, BixolonPrinter.ATTRIBUTE_NORMAL, 1);
+
     }
 
     public void saveToDataBase(final List<MenuItem> menuItems, final List<String> categories) {
@@ -300,4 +318,11 @@ public class MainActivity extends AppCompatActivity implements MenuItemsActionLi
             }
         });
     }
+
+    public static BixolonPrinter getPrinterInstance() {
+        return bixolonPrinter;
+    }
+
+
+
 }
